@@ -4,6 +4,7 @@ package net.bitpot.railways.models;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.navigation.NavigationItem;
 import com.intellij.openapi.module.Module;
+import net.bitpot.railways.contracts.RoutableApp;
 import net.bitpot.railways.gui.RailwaysIcons;
 import net.bitpot.railways.models.requestMethods.RequestMethod;
 import net.bitpot.railways.parser.route.RouteActionParser;
@@ -12,7 +13,6 @@ import net.bitpot.railways.parser.route.TextChunk;
 import net.bitpot.railways.utils.RailwaysUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.ruby.rails.model.RailsApp;
 
 import javax.swing.*;
 import java.util.List;
@@ -184,7 +184,7 @@ public class Route implements NavigationItem {
      *
      * @param app Rails application which will be checked for controller action.
      */
-    public void updateActionStatus(RailsApp app) {
+    public void updateActionStatus(RoutableApp app) {
         // Should be overridden in subclasses if an update is required.
     }
 

@@ -10,9 +10,11 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.psi.*;
 import com.intellij.ui.content.Content;
 import com.intellij.util.Alarm;
+import net.bitpot.railways.contracts.RoutesFiles;
 import net.bitpot.railways.utils.RailwaysUtils;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.ruby.rails.model.RailsApp;
+import net.bitpot.railways.contracts.RoutableApp;
+//import org.jetbrains.plugins.ruby.rails.model.RailsApp;
 
 /**
  * Stores data for a module panel in Routes tool window.
@@ -29,17 +31,17 @@ public class RoutesViewPane implements Disposable {
     /**
      * Creates a separate panel for Rails module.
      *
-     * @param railsApp Rails module that will be represented by this pane.
+     * @param routableApp Rails module that will be represented by this pane.
      * @param toolWindow Parent tool window
      */
-    RoutesViewPane(RailsApp railsApp, ToolWindow toolWindow, Content content) {
-        myModule = railsApp.getModule();
+    RoutesViewPane(RoutableApp routableApp, ToolWindow toolWindow, Content content) {
+        myModule = routableApp.getModule();
         myContent = content;
 
         myRoutesManager = ModuleServiceManager.getService(myModule, RoutesManager.class);
         myRoutesManager.initRouteList();
 
-        myRoutesChangeListener = new MyPsiTreeChangeListener(railsApp.getRoutesFiles(), toolWindow);
+        myRoutesChangeListener = new MyPsiTreeChangeListener(routableApp.getRoutesFiles(), toolWindow);
 
         PsiManager.getInstance(myModule.getProject())
                 .addPsiTreeChangeListener(myRoutesChangeListener);
@@ -89,10 +91,10 @@ public class RoutesViewPane implements Disposable {
 
     private class MyPsiTreeChangeListener extends PsiTreeChangeAdapter {
         private final Alarm alarm = new Alarm();
-        private RailsApp.RoutesFiles<VirtualFile> routesFiles;
+        private RoutesFiles<VirtualFile>  routesFiles;
         private ToolWindow myToolWindow;
 
-        MyPsiTreeChangeListener(RailsApp.RoutesFiles<VirtualFile> routesFiles, ToolWindow toolWindow) {
+        MyPsiTreeChangeListener(RoutesFiles<VirtualFile> routesFiles, ToolWindow toolWindow) {
             this.routesFiles = routesFiles;
             myToolWindow = toolWindow;
         }
