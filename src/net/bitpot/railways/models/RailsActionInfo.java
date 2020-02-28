@@ -1,8 +1,10 @@
 package net.bitpot.railways.models;
 
 import com.intellij.openapi.module.Module;
+import net.bitpot.railways.contracts.PHPClass;
+import net.bitpot.railways.contracts.PHPMethod;
 import net.bitpot.railways.gui.RailwaysIcons;
-import net.bitpot.railways.utils.RailwaysPsiUtils;
+import net.bitpot.railways.utils.StormroutesPsiUtils;
 import org.jetbrains.plugins.ruby.rails.model.RailsApp;
 import org.jetbrains.plugins.ruby.ruby.lang.psi.controlStructures.classes.RClass;
 import org.jetbrains.plugins.ruby.ruby.lang.psi.controlStructures.methods.RMethod;
@@ -21,17 +23,17 @@ public class RailsActionInfo {
 
     // Class which is referenced by route action, it might not have
     // implementation of the method, as the method can be inherited.
-    private RClass psiClass = null;
+    private PHPClass psiClass = null;
 
     // Route action method.
-    private RMethod psiMethod = null;
+    private PHPMethod psiMethod = null;
 
 
-    public RClass getPsiClass() {
+    public PHPClass getPsiClass() {
         return psiClass;
     }
 
-    public RMethod getPsiMethod() {
+    public PHPMethod getPsiMethod() {
         return psiMethod;
     }
 
@@ -74,7 +76,7 @@ public class RailsActionInfo {
         }
 
         String qualifiedName =
-                RailwaysPsiUtils.getControllerClassNameByShortName(controllerShortName);
+                StormroutesPsiUtils.getControllerClassNameByShortName(controllerShortName);
 
         if (psiClass != null && (!psiClass.isValid() ||
                 !Objects.equals(psiClass.getFQN().getFullPath(), qualifiedName))) {
@@ -84,12 +86,12 @@ public class RailsActionInfo {
 
         // Find psiClass if it's not specified or already invalid.
         if (psiClass == null) {
-            psiClass = RailwaysPsiUtils.findControllerClass(app, qualifiedName);
+            psiClass = StormroutesPsiUtils.findControllerClass(app, qualifiedName);
         }
 
         if (psiClass != null) {
             if (psiMethod == null || !psiMethod.isValid()) {
-                psiMethod = RailwaysPsiUtils.findControllerMethod(app,
+                psiMethod = StormroutesPsiUtils.findControllerMethod(app,
                         psiClass, actionName);
             } else {
                 // Even if psiMethod is valid, its name can be different - it

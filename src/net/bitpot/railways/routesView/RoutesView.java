@@ -24,13 +24,14 @@ import com.intellij.ui.content.ContentManagerEvent;
 import com.intellij.util.Alarm;
 import com.intellij.util.messages.MessageBusConnection;
 import com.intellij.util.ui.UIUtil;
+import net.bitpot.railways.contracts.RoutableApp;
 import net.bitpot.railways.gui.MainPanel;
 import net.bitpot.railways.models.RouteList;
 import net.bitpot.railways.navigation.ChooseByRouteRegistry;
 import net.bitpot.railways.utils.RailwaysUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.ruby.rails.model.RailsApp;
+//import org.jetbrains.plugins.ruby.rails.model.RailsApp;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -140,6 +141,11 @@ public class RoutesView implements PersistentStateComponent<RoutesView.State>,
 
         myConnection.subscribe(ToolWindowManagerListener.TOPIC, new ToolWindowManagerListener() {
 
+            @Override
+            public void toolWindowRegistered(@NotNull String s) {
+
+            }
+
             /**
              * This method is called when ToolWindow changes its state, i.e.
              * expanded/collapsed, docked to another panel, etc.
@@ -246,7 +252,9 @@ public class RoutesView implements PersistentStateComponent<RoutesView.State>,
     public void addModulePane(Module module) {
         // Skip if RoutesView is not initialized or if added module is not
         // Rails application.
-        RailsApp railsApp = RailsApp.fromModule(module);
+//        RailsApp railsApp = RailsApp.fromModule(module);
+        RoutableApp railsApp = RoutableApp.fromModule(module);
+
         if ((myContentManager == null) || railsApp == null)
             return;
 

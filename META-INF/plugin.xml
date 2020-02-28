@@ -130,8 +130,8 @@
     <idea-version since-build="192" />
 
 
-    <depends>com.intellij.modules.ruby</depends>
-
+<!--    <depends>com.intellij.modules.ruby</depends>-->
+    <depends>com.jetbrains.php</depends>
 
     <project-components>
         <component>

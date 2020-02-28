@@ -5,7 +5,7 @@ import net.bitpot.railways.gui.RailwaysIcons;
 import net.bitpot.railways.models.RailsActionInfo;
 import net.bitpot.railways.models.Route;
 import net.bitpot.railways.models.requestMethods.RequestMethod;
-import net.bitpot.railways.utils.RailwaysPsiUtils;
+import net.bitpot.railways.utils.StormroutesPsiUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.ruby.rails.model.RailsApp;
 import org.jetbrains.plugins.ruby.ruby.lang.psi.controlStructures.classes.RClass;
@@ -57,7 +57,7 @@ public class SimpleRoute extends Route {
         if (ctrlClass != null)
             ctrlClassName = ctrlClass.getQualifiedName();
         else
-            ctrlClassName = RailwaysPsiUtils.getControllerClassNameByShortName(controllerName);
+            ctrlClassName = StormroutesPsiUtils.getControllerClassNameByShortName(controllerName);
 
         return String.format("%s#%s", ctrlClassName, actionName);
     }

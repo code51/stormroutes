@@ -8,6 +8,8 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.stubs.StubIndex;
 import com.intellij.psi.util.PsiElementFilter;
 import com.intellij.psi.util.PsiTreeUtil;
+import net.bitpot.railways.contracts.*;
+import net.bitpot.railways.facades.PHPProjectAndLibrariesScope;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.ruby.rails.model.RailsApp;
@@ -22,7 +24,7 @@ import org.jetbrains.plugins.ruby.ruby.lang.psi.controlStructures.names.RSuperCl
 import org.jetbrains.plugins.ruby.ruby.lang.psi.holders.RContainer;
 import org.jetbrains.plugins.ruby.ruby.lang.psi.indexes.RubyClassModuleNameIndex;
 import org.jetbrains.plugins.ruby.ruby.lang.psi.methodCall.RCall;
-import org.jetbrains.plugins.ruby.utils.NamingConventions;
+//import org.jetbrains.plugins.ruby.utils.NamingConventions;
 
 import java.util.Collection;
 
@@ -31,7 +33,7 @@ import java.util.Collection;
  *
  * Created by Basil Gren on 11/27/14.
  */
-public class RailwaysPsiUtils {
+public class StormroutesPsiUtils {
 
 
     /**
@@ -42,20 +44,20 @@ public class RailwaysPsiUtils {
      * @return Found RClass object or null if nothing is found.
      */
     @Nullable
-    public static RClass findControllerClass(RailsApp app, String qualifiedClassName) {
+    public static PHPClass findControllerClass(RoutableApp app, String qualifiedClassName) {
         if ((app == null) || qualifiedClassName.isEmpty())
             return null;
 
         // Lookup in application controllers
-        RailsController ctrl = app.findController(qualifiedClassName);
+        PHPController ctrl = app.findController(qualifiedClassName);
         if (ctrl != null)
             return ctrl.getRClass();
 
         // If controller is not found among application classes, proceed with
         // global class lookup
-        RContainer cont = findClassOrModule(qualifiedClassName,
+        PHPContainer cont = findClassOrModule(qualifiedClassName,
                 app.getProject());
-        return cont instanceof RClass ? (RClass)cont : null;
+        return cont instanceof PHPClass ? (PHPClass) cont : null;
     }
 
 
@@ -70,13 +72,13 @@ public class RailwaysPsiUtils {
      * @return RMethod object of null.
      */
     @Nullable
-    public static RMethod findControllerMethod(RailsApp app,
-                                               @NotNull RClass ctrlClass,
-                                               @NotNull String methodName) {
-        RClass currentClass = ctrlClass;
+    public static PHPMethod findControllerMethod(RoutableApp app,
+                                                 @NotNull PHPClass ctrlClass,
+                                                 @NotNull String methodName) {
+        PHPClass currentClass = ctrlClass;
 
         while (true) {
-            RMethod method = RubyPsiUtil.getMethodWithPossibleZeroArgsByName(currentClass, methodName);
+            PHPMethod method = PHPPsiUtil.getMethodWithPossibleZeroArgsByName(currentClass, methodName);
             if (method != null)
                 return method;
 
@@ -85,7 +87,7 @@ public class RailwaysPsiUtils {
                 return method;
 
             // Search in parent classes
-            RSuperClass psiParentRef = currentClass.getPsiSuperClass();
+            PHPSuperClass psiParentRef = currentClass.getPsiSuperClass();
             if ((psiParentRef == null) || (psiParentRef.getName() == null))
                 return null;
 
@@ -105,7 +107,7 @@ public class RailwaysPsiUtils {
      * @return RClass object, RModule object or null.
      */
     @Nullable
-    public static RContainer findClassOrModule(@NotNull String qualifiedName,
+    public static PHPContainer findClassOrModule(@NotNull String qualifiedName,
                                                @NotNull Project project) {
         // Search should be performed using only class name, without modules.
         // For example, if we have Devise::SessionsController, we should search
@@ -118,14 +120,14 @@ public class RailwaysPsiUtils {
         for (Object item: items) {
             String name = null;
 
-            if (item instanceof RClass)
-                name = ((RClass)item).getQualifiedName();
-            else if (item instanceof RModule)
-                name = ((RModule)item).getQualifiedName();
+            if (item instanceof PHPClass)
+                name = ((PHPClass) item).getQualifiedName();
+            else if (item instanceof PHPModule)
+                name = ((PHPModule)item).getQualifiedName();
 
             // Perform case insensitive comparison to avoid mess with acronyms.
             if (qualifiedName.equalsIgnoreCase(name))
-                return (RContainer)item;
+                return (PHPContainer) item;
         }
 
         return null;
@@ -144,11 +146,11 @@ public class RailwaysPsiUtils {
      */
     @NotNull
     public static Collection findClassesAndModules(String name, Project project) {
-        GlobalSearchScope scope = new RubyProjectAndLibrariesScope(project);
+        GlobalSearchScope scope = new PHPProjectAndLibrariesScope(project);
 
         // StubIndex.getElements was introduced in 134.231 build (RubyMine 6.3)
-        return StubIndex.getElements(RubyClassModuleNameIndex.KEY,
-                name, project, scope, RContainer.class);
+        return StubIndex.getElements(PHPClassModuleNameIndex.KEY,
+                name, project, scope, PHPContainer.class);
     }
 
 
@@ -191,7 +193,7 @@ public class RailwaysPsiUtils {
      * @return First method which name matches methodName
      */
     @Nullable
-    private static RMethod findMethodInClassModules(RClass ctrlClass, String methodName) {
+    private static PHPMethod findMethodInClassModules(PHPClass ctrlClass, String methodName) {
         PsiElement[] elements = PsiTreeUtil.collectElements(ctrlClass,
                 INCLUDE_MODULE_FILTER);
 
@@ -199,17 +201,18 @@ public class RailwaysPsiUtils {
         // same-named methods of previously included module.
         int i = elements.length;
         while (--i >= 0) {
-            RCall includeMethodCall = (RCall)elements[i];
+            PHPCall includeMethodCall = (PHPCall) elements[i];
 
-            RPsiElement moduleNameArg = includeMethodCall.getArguments().get(0);
+            PHPPsiElement moduleNameArg = includeMethodCall.getArguments().get(0);
+
             if (moduleNameArg == null)
                 continue;
 
-            RContainer cont = findClassOrModule(moduleNameArg.getText(),
+            PHPContainer cont = findClassOrModule(moduleNameArg.getText(),
                     ctrlClass.getProject());
 
-            if (cont instanceof RModule)
-                return RubyPsiUtil.getMethodWithPossibleZeroArgsByName(cont, methodName);
+            if (cont instanceof PHPModule)
+                return PHPPsiUtil.getMethodWithPossibleZeroArgsByName(cont, methodName);
         }
 
         return null;
@@ -220,8 +223,8 @@ public class RailwaysPsiUtils {
             if (elem instanceof PsiNamedElement) {
                 System.out.println(elem.getClass().getName() + " --> Name: " + ((PsiNamedElement)elem).getName());
 
-                if (elem instanceof RClass)
-                    System.out.println(" ----- Class qualified name: " + ((RClass)elem).getQualifiedName());
+                if (elem instanceof PHPClass)
+                    System.out.println(" ----- Class qualified name: " + ((PHPClass)elem).getQualifiedName());
 
             } else
                 System.out.println(elem.getClass().getName() + " --> No name");

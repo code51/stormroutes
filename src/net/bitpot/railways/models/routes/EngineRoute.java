@@ -1,10 +1,11 @@
 package net.bitpot.railways.models.routes;
 
 import com.intellij.openapi.module.Module;
+import net.bitpot.railways.contracts.PHPContainer;
 import net.bitpot.railways.gui.RailwaysIcons;
 import net.bitpot.railways.models.Route;
 import net.bitpot.railways.models.requestMethods.RequestMethod;
-import net.bitpot.railways.utils.RailwaysPsiUtils;
+import net.bitpot.railways.utils.StormroutesPsiUtils;
 import org.jetbrains.plugins.ruby.ruby.lang.psi.holders.RContainer;
 
 import javax.swing.*;
@@ -39,7 +40,7 @@ public class EngineRoute extends Route {
 
     @Override
     public void navigate(boolean requestFocus) {
-        RContainer container = RailwaysPsiUtils.
+        PHPContainer container = StormroutesPsiUtils.
                 findClassOrModule(engineClass, getModule().getProject());
 
         if (container != null)
